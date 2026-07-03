@@ -1,0 +1,35 @@
+{
+  "name": "chatapp-project",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "Dipanshu Yadav",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "server": "nodemon backend/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@chakra-ui/icons": "^1.1.7",
+    "@chakra-ui/react": "^1.8.9",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "axios": "^1.18.0",
+    "bcryptjs": "^3.0.3",
+    "colors": "^1.4.0",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-async-handler": "^1.2.0",
+    "framer-motion": "^4.1.17",
+    "jsonwebtoken": "^9.0.3",
+    "mongodb": "^7.3.0",
+    "mongoose": "^9.7.0",
+    "react-notification-badge": "^1.5.1",
+    "react-router-dom": "^5.3.0",
+    "socket.io": "^4.8.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
