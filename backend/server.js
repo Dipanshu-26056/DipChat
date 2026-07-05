@@ -38,13 +38,7 @@ const server = app.listen(PORT, console.log(`Server started on PORT ${PORT}`.yel
 const io = require('socket.io')(server,{
     pingTimeout: 60000,
     cors: {
-        origin: function (origin, callback) {
-            if (!origin || /^http:\/\/localhost:\d+$/.test(origin)) {
-                callback(null, true);
-            } else {
-                callback(new Error("Not allowed by CORS"));
-            }
-        },
+        origin: true,
     },
 });
 
@@ -79,5 +73,3 @@ io.on("connection",(socket) => {
         socket.leave(socket.id);
     });
 });
-
-
