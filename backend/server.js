@@ -1,5 +1,6 @@
+const path = require("path");
 const dotenv = require("dotenv");
-dotenv.config();
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 const express = require("express");
 const cors = require("cors");
@@ -9,7 +10,9 @@ const colors = require("colors");
 const userRoutes = require("./routes/userRoutes");
 const chatRoutes = require("./routes/chatRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const summarizeRoute = require("./routes/summarize.route.js");
 const {notFound,errorHandler} = require("./middlewares/errorMiddleware");
+
 
 console.log("MONGO_URI:", process.env.MONGO_URI);
 
@@ -26,6 +29,7 @@ app.get('/', (req,res) => {
 app.use('/api/user',userRoutes);
 app.use('/api/chat',chatRoutes);
 app.use('/api/message',messageRoutes);
+app.use('/api', summarizeRoute)
 app.use(notFound)
 app.use(errorHandler)
 

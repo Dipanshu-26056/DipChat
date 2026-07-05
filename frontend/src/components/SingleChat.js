@@ -1,6 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Text, IconButton, FormControl, useToast, Input, Spinner } from '@chakra-ui/react';
-import { ArrowBackIcon } from '@chakra-ui/icons';
+import {
+  Box,
+  Text,
+  IconButton,
+  FormControl,
+  useToast,
+  Input,
+  Spinner,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalCloseButton,
+  ModalBody,
+  useDisclosure,
+} from '@chakra-ui/react';
+import { ArrowBackIcon, InfoOutlineIcon } from '@chakra-ui/icons';
 import { ChatState } from "../Context/ChatProvider";
 import { getSender, getSenderFull } from '../config/ChatLogics';
 import ProfileModal from './miscellaneous/ProfileModal';
@@ -13,13 +28,17 @@ import io from 'socket.io-client'
 import Lottie from "react-lottie"
 import animationData from "../animations/typing.json";             
 
-const ENDPOINT = "http://localhost:3000";
+const ENDPOINT = process.env.REACT_APP_API_URL || "http://localhost:3000";
 var socket, selectedChatCompare;
 
 const SingleChat = ({ fetchAgain, setFetchAgain }) => {
   const [messages,setMessages] = useState([])
   const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [summary, setSummary] = useState("");
+  const [summarizing, setSummarizing] = useState(false);
 
   const [socketConnected, setsocketConnected] = useState(false);
   const [typing, setTyping] = useState(false);
@@ -176,6 +195,41 @@ const typingHandler = (e) => {
 
   }, timerLength);
 };
+
+const handleSummarize = async () => {
+  if (!messages || messages.length === 0) {
+    toast({
+      title: "No messages to summarize",
+      status: "warning",
+      duration: 3000,
+      isClosable: true,
+    });
+    return;
+  }
+  setSummarizing(true);
+  onOpen();
+  try {
+    const formattedMessages = messages.map(
+      (m) => `${m.sender.name}: ${m.content}`
+    );
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+    const { data } = await axios.post(
+      "/api/summarize",
+      { messages: formattedMessages },
+      config
+    );
+    setSummary(data.summary);
+  } catch (error) {
+    setSummary("Failed to generate summary. Please try again.");
+  }
+  setSummarizing(false);
+};
+
   return <>{
     selectedChat ? (
         <>
@@ -211,6 +265,12 @@ const typingHandler = (e) => {
                       />
                     </>
                 )}
+                <IconButton
+                  icon={<InfoOutlineIcon />}
+                  onClick={handleSummarize}
+                  size="sm"
+                  aria-label="Summarize chat"
+                />
 
             </Text>
             <Box
@@ -263,6 +323,17 @@ const typingHandler = (e) => {
                
 
             </Box>
+
+            <Modal isOpen={isOpen} onClose={onClose}>
+              <ModalOverlay />
+              <ModalContent>
+                <ModalHeader>Chat Summary</ModalHeader>
+                <ModalCloseButton />
+                <ModalBody pb={6}>
+                  {summarizing ? <Spinner /> : <Text>{summary}</Text>}
+                </ModalBody>
+              </ModalContent>
+            </Modal>
         </>
 
     ) : (
